@@ -1,43 +1,94 @@
 #include"utils.h"
 
 t_log* logger;
+static int addrlen;
 
 int iniciar_servidor(void)
 {
-	// Quitar esta línea cuando hayamos terminado de implementar la funcion
-	assert(!"no implementado!");
+    int server_fd;
+    struct sockaddr_in server_addr;
+    int opt = 1;
+    addrlen = sizeof(server_addr);
 
-	int socket_servidor;
+	// Create socket 
+    if ((server_fd = socket(AF_INET,SOCK_STREAM,0)) == -1)
+    {
+        perror("Socket failed.");
+		log_error(logger,"Socket failed.");
+        exit(EXIT_FAILURE);
+    }
 
-	struct addrinfo hints, *servinfo, *p;
+	// Set socket options
+    if(setsockopt(server_fd,SOL_SOCKET,SO_REUSEADDR,&opt,sizeof(opt)) == -1){
+        perror("setsockopt failed.");
+		log_error(logger,"setsockopt failed.");
+        exit(EXIT_FAILURE);
+    }
 
-	memset(&hints, 0, sizeof(hints));
-	hints.ai_family = AF_INET;
-	hints.ai_socktype = SOCK_STREAM;
-	hints.ai_flags = AI_PASSIVE;
+    server_addr.sin_family = AF_INET;
+    server_addr.sin_addr.s_addr = INADDR_ANY;
+    server_addr.sin_port = htons(PORT);
 
-	getaddrinfo(NULL, PUERTO, &hints, &servinfo);
+    // Bind socket
+    if (bind(server_fd,(struct sockaddr *)&server_addr,sizeof(server_addr))< 0)
+    {
+        perror("bind failed.");
+		log_error(logger,"bind failed.");
+        exit(EXIT_FAILURE);
+    }
 
-	// Creamos el socket de escucha del servidor
+    // Listen for incoming connections
+    if (listen(server_fd,MAX_CLIENTS) < 0)
+    {
+        perror("listen failed.");
+		log_error(logger,"listen failed.");
+        exit(EXIT_FAILURE);
+    }
 
-	// Asociamos el socket a un puerto
+	log_trace(logger, "Listo para escuchar a mi cliente\n");
+	log_info(logger,"Server listening on port %d\n",PORT);
 
-	// Escuchamos las conexiones entrantes
-
-	freeaddrinfo(servinfo);
-	log_trace(logger, "Listo para escuchar a mi cliente");
-
-	return socket_servidor;
+	return server_fd;
 }
 
 int esperar_cliente(int socket_servidor)
 {
-	// Quitar esta línea cuando hayamos terminado de implementar la funcion
-	assert(!"no implementado!");
-
 	// Aceptamos un nuevo cliente
 	int socket_cliente;
+    struct sockaddr_in client_addr;
+	char client_ip[INET_ADDRSTRLEN];
+	
+
+
+	if ((socket_cliente = accept(socket_servidor,(struct sockaddr *)&client_addr,(socklen_t *)&addrlen)) < 0)
+        {
+            perror("accept failed.");
+			log_error(logger,"accept failed.");
+            exit(EXIT_FAILURE);
+        }
+
+
+	// Convert client address to string
+	inet_ntop(AF_INET, &(client_addr.sin_addr), client_ip, INET_ADDRSTRLEN);
+	printf("Client connected from IP: %s\n", client_ip);
+
 	log_info(logger, "Se conecto un cliente!");
+	log_info(logger, "IP %s",client_ip);
+
+
+	// Send response to client
+	log_info(logger,"Sending response to client...\n");
+	char * message = "Hello from server Linux.";
+	
+	if ((send(socket_cliente,message,strlen(message),0)) == -1)
+	{
+
+		perror("send message failed.");
+		log_error(logger,"send message failed.");
+		exit(EXIT_FAILURE);		
+	}
+	
+	log_info(logger,"Response sent to client\n");
 
 	return socket_cliente;
 }

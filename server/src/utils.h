@@ -10,9 +10,10 @@
 #include<commons/collections/list.h>
 #include<string.h>
 #include<assert.h>
+#include <arpa/inet.h>
 
-#define PUERTO "4444"
-
+#define PORT 4444
+#define MAX_CLIENTS 3
 typedef enum
 {
 	MENSAJE,

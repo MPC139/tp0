@@ -9,6 +9,7 @@
 #include<netdb.h>
 #include<string.h>
 #include<commons/log.h>
+#include <arpa/inet.h>
 
 typedef enum
 {

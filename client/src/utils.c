@@ -18,6 +18,7 @@ void* serializar_paquete(t_paquete* paquete, int bytes)
 
 int crear_conexion(char *ip, char* puerto)
 {
+	/*
 	struct addrinfo hints;
 	struct addrinfo *server_info;
 
@@ -35,6 +36,37 @@ int crear_conexion(char *ip, char* puerto)
 
 
 	freeaddrinfo(server_info);
+	*/
+
+
+	int socket_cliente = 0;
+	struct sockaddr_in server_addr;
+
+	
+	if ((socket_cliente = socket(AF_INET,SOCK_STREAM,0)) < 0)
+	{
+		perror("Socket creation failed.");
+		exit(EXIT_FAILURE);
+	}
+
+	server_addr.sin_family = AF_INET;
+	server_addr.sin_port = htons((uint16_t)atoi(puerto));
+	
+	
+	if ((inet_pton(AF_INET,(ip),&server_addr.sin_addr)) <= 0)
+	{
+		perror("Invalid address/ Address no supported.");
+		exit(EXIT_FAILURE);
+	}
+	
+	
+	
+	if ((connect(socket_cliente,(struct sockaddr *)&server_addr,sizeof(server_addr))) < 0)
+	{
+		perror("Connection failed.");
+		exit(EXIT_FAILURE);
+	}
+	
 
 	return socket_cliente;
 }
