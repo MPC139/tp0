@@ -56,6 +56,7 @@ int esperar_cliente(int socket_servidor)
 	// Aceptamos un nuevo cliente
 	int socket_cliente;
     struct sockaddr_in client_addr;
+	char buffer[1024] = {'\0'};
 	char client_ip[INET_ADDRSTRLEN];
 	
 
@@ -74,6 +75,16 @@ int esperar_cliente(int socket_servidor)
 
 	log_info(logger, "Se conecto un cliente!");
 	log_info(logger, "IP %s",client_ip);
+
+	if ((read(socket_cliente,buffer,sizeof(buffer))) == -1)
+	{
+		perror("read message failed.");
+		log_error(logger,"read message failed.");
+		exit(EXIT_FAILURE);	
+	}
+	
+	log_info(logger,"Client message: %s\n",buffer);
+
 
 
 	// Send response to client

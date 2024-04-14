@@ -60,11 +60,11 @@ int main(void)
 
 	// Creamos una conexión hacia el servidor
 	conexion = crear_conexion(ip, puerto);
-
+	enviar_mensaje(valor,conexion);
 	// Enviamos al servidor el valor de CLAVE como mensaje
 
 	// Armamos y enviamos el paquete
-	//paquete(conexion);
+	paquete(conexion);
 
 	terminar_programa(conexion, logger, config);
 
@@ -123,10 +123,31 @@ void paquete(int conexion)
 	// Ahora toca lo divertido!
 	char* leido;
 	t_paquete* paquete;
+	paquete = crear_paquete();
+
+	while (1)
+	{
+		leido = readline("> ");
+		if (strlen(leido) == 0)
+			{
+				break;
+			}
+		if (leido)		
+			{
+				agregar_a_paquete(paquete,leido,strlen(leido)+1);
+			}
+		if (!strncmp(leido,"exit",4))
+			{
+				enviar_paquete(paquete,conexion);
+				eliminar_paquete(paquete);
+				free(leido);
+				liberar_conexion(conexion);
+				break;
+			}
+	}
+	
 
 	// Leemos y esta vez agregamos las lineas al paquete
-
-
 	// ¡No te olvides de liberar las líneas y el paquete antes de regresar!
 	
 }

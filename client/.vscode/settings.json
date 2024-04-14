@@ -2,6 +2,7 @@
     "debug.onTaskErrors": "abort",
     "files.associations": {
         "*.h": "c",
+        "system_error": "c"
     },
     "C_Cpp.errorSquiggles": "disabled",
 }

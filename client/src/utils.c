@@ -18,30 +18,11 @@ void* serializar_paquete(t_paquete* paquete, int bytes)
 
 int crear_conexion(char *ip, char* puerto)
 {
-	/*
-	struct addrinfo hints;
-	struct addrinfo *server_info;
 
-	memset(&hints, 0, sizeof(hints));
-	hints.ai_family = AF_INET;
-	hints.ai_socktype = SOCK_STREAM;
-	hints.ai_flags = AI_PASSIVE;
-
-	getaddrinfo(ip, puerto, &hints, &server_info);
-
-	// Ahora vamos a crear el socket.
-	int socket_cliente = 0;
-
-	// Ahora que tenemos el socket, vamos a conectarlo
-
-
-	freeaddrinfo(server_info);
-	*/
-
-
-	int socket_cliente = 0;
+	int socket_cliente;
 	struct sockaddr_in server_addr;
-
+    char *message = "Hello there, I send this message from client side.";
+    char buffer[1024] = {0};
 	
 	if ((socket_cliente = socket(AF_INET,SOCK_STREAM,0)) < 0)
 	{
@@ -67,6 +48,15 @@ int crear_conexion(char *ip, char* puerto)
 		exit(EXIT_FAILURE);
 	}
 	
+    // Send data to server
+    send(socket_cliente, message, strlen(message), 0);
+	//enviar_mensaje("Hello there, I send this message from client side.\n",socket_cliente);
+    printf("Message sent to server\n");
+
+    // Receive response from server
+    read(socket_cliente, buffer, sizeof(buffer));
+    printf("Server response: %s\n", buffer);
+
 
 	return socket_cliente;
 }
