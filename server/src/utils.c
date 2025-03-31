@@ -4,12 +4,10 @@ t_log* logger;
 
 int iniciar_servidor(void)
 {
-	// Quitar esta línea cuando hayamos terminado de implementar la funcion
-	assert(!"no implementado!");
-
+	
 	int socket_servidor;
-
-	struct addrinfo hints, *servinfo, *p;
+	int error;
+	struct addrinfo hints, *servinfo;
 
 	memset(&hints, 0, sizeof(hints));
 	hints.ai_family = AF_INET;
@@ -18,11 +16,32 @@ int iniciar_servidor(void)
 
 	getaddrinfo(NULL, PUERTO, &hints, &servinfo);
 
-	// Creamos el socket de escucha del servidor
+	socket_servidor = socket(servinfo->ai_family, servinfo->ai_socktype, servinfo->ai_protocol);
+	if (socket_servidor == -1) {
+		log_error(logger, "Error al crear el socket");
+		abort();
+	}
+	log_info(logger, "Socket creado correctamente");
 
-	// Asociamos el socket a un puerto
+	if (setsockopt(socket_servidor, SOL_SOCKET, SO_REUSEADDR, &(int){ 1 }, sizeof(int)) == -1) {
+		log_error(logger, "Error al configurar el socket");
+		abort();
+	}
+	log_info(logger, "Socket configurado correctamente");
 
-	// Escuchamos las conexiones entrantes
+	
+	if (bind(socket_servidor, servinfo->ai_addr, servinfo->ai_addrlen) == -1) {
+		log_error(logger, "Error al asociar el socket");
+		abort();
+	}
+	log_info(logger, "Socket asociado correctamente");
+
+	// Escuchamos el socket
+	if (listen(socket_servidor, SOMAXCONN) == -1) {
+		log_error(logger, "Error al escuchar el socket");
+		abort();
+	}
+	log_info(logger, "Socket escuchando correctamente");
 
 	freeaddrinfo(servinfo);
 	log_trace(logger, "Listo para escuchar a mi cliente");
@@ -32,11 +51,17 @@ int iniciar_servidor(void)
 
 int esperar_cliente(int socket_servidor)
 {
-	// Quitar esta línea cuando hayamos terminado de implementar la funcion
-	assert(!"no implementado!");
 
 	// Aceptamos un nuevo cliente
 	int socket_cliente;
+	int error;
+	// Aceptamos un nuevo cliente
+	error = accept(socket_servidor, NULL, NULL);
+	if (error == -1) {
+		log_error(logger, "Error al aceptar el cliente");
+		abort();
+	}
+	log_info(logger, "Cliente aceptado correctamente");
 	log_info(logger, "Se conecto un cliente!");
 
 	return socket_cliente;
