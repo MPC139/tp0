@@ -123,15 +123,22 @@ void paquete(int conexion)
 	// Leemos líneas desde la consola y las agregamos al paquete
 	leido = readline("> ");
 	while (strcmp(leido, "") != 0) {
+		enviar_paquete(paquete, conexion);
 		agregar_a_paquete(paquete, leido, strlen(leido) + 1);
+
 		free(leido);
+		free(paquete->buffer->stream);
+		
+		paquete->buffer->size = 0;
+
+		paquete->buffer->stream = NULL;
+
 		leido = readline("> ");
 	}
 	free(leido);
 	// Agregamos un string al paquete
 	//agregar_a_paquete(paquete, "MESSI", strlen("MESSI") + 1);
 	// Enviamos el paquete al servidor
-	enviar_paquete(paquete, conexion);
 
 	// Liberamos la memoria utilizada por el paquete
 	eliminar_paquete(paquete);
